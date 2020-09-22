@@ -5,11 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -24,7 +28,7 @@ public class Thing1ServiceApplication {
 @RestController
 @RequestMapping("/things")
 class ThingsController {
-	private final WebClient client = WebClient.create("http://localhost:8090");
+	private final WebClient client = WebClient.create("http://localhost:8090/thingtwothings");
 
 	@GetMapping("/thing1")
 	Thing1 getThing1() {
@@ -33,13 +37,21 @@ class ThingsController {
 	}
 	
 	@GetMapping("/thing2")
-	Thing2 getThing2FromThing2Service() {
+	Mono<Thing2> getThing2FromThing2Service() {
 		return client.get()
 				.uri("/thing2")
 				.retrieve()
 				.bodyToMono(Thing2.class)
-				.log()
-				.block();
+				.log();
+	}
+
+	@GetMapping(value = "/afewthing2s")
+	Flux<Thing2> getThing2s() {
+		return client.get()
+				.uri("/afewthing2s")
+				.retrieve()
+				.bodyToFlux(Thing2.class)
+				.log();
 	}
 }
 
