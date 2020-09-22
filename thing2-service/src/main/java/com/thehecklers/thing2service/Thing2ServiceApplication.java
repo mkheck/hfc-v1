@@ -47,6 +47,14 @@ class ThingController {
                         .map(name -> new Thing2(UUID.randomUUID().toString(), name)));
 
     }
+
+    @GetMapping(value = "/thing2stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    Flux<Thing2> getThingStream() {
+        return Flux.interval(Duration.ofSeconds(1))
+                .map(l -> new Thing2(UUID.randomUUID().toString(),
+                        names.get(rnd.nextInt(names.size()))))
+                .log();
+    }
 }
 
 @Data

@@ -35,20 +35,21 @@ class ThingsController {
 		return new Thing1(UUID.randomUUID().toString(),
 				"Thing 1 from thing1-service");
 	}
-	
-	@GetMapping("/thing2")
-	Mono<Thing2> getThing2FromThing2Service() {
-		return client.get()
-				.uri("/thing2")
-				.retrieve()
-				.bodyToMono(Thing2.class)
-				.log();
-	}
 
-	@GetMapping(value = "/afewthing2s")
+	@GetMapping(value = "/afewthing2s", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	Flux<Thing2> getThing2s() {
 		return client.get()
 				.uri("/afewthing2s")
+				.retrieve()
+				.bodyToFlux(Thing2.class)
+				.delayElements(Duration.ofSeconds(1))
+				.log();
+	}
+
+	@GetMapping(value = "/thing2stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	Flux<Thing2> getThing2StreamFromThing2Service() {
+		return client.get()
+				.uri("/thing2stream")
 				.retrieve()
 				.bodyToFlux(Thing2.class)
 				.log();
